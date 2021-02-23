@@ -8,9 +8,13 @@
 using namespace std;
 
 struct student{
+	//Define struct student with four member (name ,id , gender, gpa);
+    string name;
+    int id;
+	char gender;
+	double gpa;
 
-    //Define struct student with four member (name ,id , gender, gpa);
-    
+
 };
 
 struct course{
@@ -20,7 +24,8 @@ struct course{
 	vector<student *> student_list;
 };
 
-student * findstudent(vector<student> allstudents,int key){ //There is something wrong in this line.
+student * findstudent(vector<student> &allstudents,int key){ //Correct this line
+
 	for(unsigned int i = 0; i < allstudents.size(); i++){
 		if(allstudents[i].id  == key) return &allstudents[i];
 	}
@@ -60,22 +65,27 @@ int main(){
 	vector<course> allcourses;
 	
 	string textline;
+	char namedata[100];
+	int iddata;
+	char genderdata;
+	char format[]="%[^,], %d ,%c, %f";
+	float gpadata;
 	
 	while(getline(student_file,textline)){
-		student s; 
 		
-		//Use sscanf() to split the values in textline and assign those values to the members of struct s;
-
+		//Assign value to the members of struct s;
+		sscanf(textline.c_str(),format,namedata,&iddata,&genderdata,&gpadata);
+		student s={namedata,iddata,genderdata,gpadata};
 		allstudents.push_back(s); 		
 	}
 	
 	int state = 1;
 	while(getline(course_file,textline)){
 		if(state == 1){
-			course c;
+			course c ;
 			int loc = textline.find_first_of('(');
-			c.name = textline.substr(0,loc-1);
-			c.id = atof(textline.substr(loc+1,5).c_str());
+			c.name = textline.substr(0,loc-1); //name
+			c.id = atof(textline.substr(loc+1,5).c_str()); //id
 			getline(course_file,textline);
 			allcourses.push_back(c);
 			state = 2;			
@@ -83,21 +93,19 @@ int main(){
 			if(textline == "> Students"){
 				state = 3;
 			}else{
-			
-			    //Append (push_back) textline to lecture_list[] of the recently added course in allcourses[];
-			    
+				//Append lecture_list;
+				allcourses[allcourses.size()-1].lecture_list.push_back(textline);
 			}			
 		}else{
 			if(textline == "---------------------------------------"){
 				state = 1;
 			}else{
 				student *p = findstudent(allstudents,atof(textline.c_str()));
-				
-				//Append (push_back) p to student_list of the recently added course in allcourses[];
-				
+				//Append student_list;
+				allcourses[allcourses.size()-1].student_list.push_back(p);
 			}
 		}
 	}
 	printreport(allcourses);
-	
+	return 0;
 }
